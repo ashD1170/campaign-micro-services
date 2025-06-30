@@ -1,5 +1,7 @@
 package com.ashish.in.Async_file_service.Service;
 
+import com.ashish.in.Async_file_service.DTO.CampaignRecord;
+import com.ashish.in.Async_file_service.DTO.CampaignRecordList;
 import com.ashish.in.Async_file_service.DTO.FileUploadEvent;
 import com.ashish.in.Async_file_service.Model.FileRecord;
 import com.ashish.in.Async_file_service.Repository.FileRecordRepository;
@@ -8,8 +10,6 @@ import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,6 +39,7 @@ public class FileRecordService {
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 FileRecord record = getFileRecord(event, headers, line);
+
 
                 records.add(record);
                 if(records.size() >= batchSize) {
@@ -78,5 +79,25 @@ public class FileRecordService {
 
     public void deleteAllRecords(String userId, String campaignId) {
         fileRecordRepository.deleteByUserIdAndCampaignId(userId,campaignId);
+    }
+
+    public CampaignRecordList getRecords(String userId, String campaignId) {
+        List<FileRecord> fileRecord = fileRecordRepository.getByUserIdAndCampaignId(userId,campaignId);
+        List<CampaignRecord> campaignRecords = fileRecord.stream().
+                map(FileRecordService::createCampaignRecordObject).toList();
+
+        CampaignRecordList campaignRecordList = new CampaignRecordList();
+        campaignRecordList.setCampaignRecordList(campaignRecords);
+        campaignRecordList.setCount(campaignRecords.size());
+        return campaignRecordList;
+    }
+
+    private static CampaignRecord createCampaignRecordObject(FileRecord record) {
+        CampaignRecord campaignRecord = new CampaignRecord();
+        campaignRecord.setUserId(record.getUserId());
+        campaignRecord.setCampaignId(record.getCampaignId());
+        campaignRecord.setPhoneNumber(record.getPhoneNumber());
+        campaignRecord.setData(record.getData());
+        return campaignRecord;
     }
 }

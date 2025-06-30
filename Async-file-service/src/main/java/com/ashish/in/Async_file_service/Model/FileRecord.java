@@ -16,7 +16,7 @@ public class FileRecord {
     @Id
     private String id;
     private String userId;
-    private String CampaignId;
+    private String campaignId;
     private String phoneNumber;
     private String fileName;
     private Map<String,String> data;

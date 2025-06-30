@@ -29,6 +29,7 @@ public class FileUploadListenerService {
         if(fileMetadata != null) {
             log.info("FileMetadata already exists for userId:{},campaignId:{}", event.getUserId(), event.getCampaignId());
             fileMetadata.setFileName(event.getFilename());
+            fileMetadata.setStatus(FileUploadStatus.PROCESSING);
             log.info("FileMetadata updated: {}", fileMetadata);
             log.info("Deleting and Updating records for the userId:{},campaignId{}", fileMetadata.getUserId(), event.getCampaignId());
             fileRecordService.deleteAllRecords(event.getUserId(),event.getCampaignId());
