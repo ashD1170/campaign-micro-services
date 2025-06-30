@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -26,7 +27,7 @@ public class FileProcessingService {
         System.out.println("started file upload");
         log.info("File Upload Started for the campaignId:{} with filename:{}",campaignId, file.getOriginalFilename());
 
-        String key = getString(file, userId, campaignId);
+        String key = getString(userId, campaignId);
         s3Service.uploadFileToS3(file,key);
         FileUploadEvent fileUploadEvent = generateFileUploadEvent(file, userId, campaignId);
 
@@ -56,7 +57,7 @@ public class FileProcessingService {
         return fileUploadEvent;
     }
 
-    private static String getString(MultipartFile file, String userId, String campaignId) {
+    private static String getString(String userId, String campaignId) {
         return userId + "/" + campaignId;
     }
 }

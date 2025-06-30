@@ -8,6 +8,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -22,6 +23,7 @@ public class FileRecordService {
 
     private final S3Service s3Service;
     private final FileRecordRepository repository;
+    private final FileRecordRepository fileRecordRepository;
     @Value("${file.upload.batch-size}")
     private int batchSize;
 
@@ -71,6 +73,10 @@ public class FileRecordService {
     }
 
     private static String getKey(FileUploadEvent event) {
-        return event.getUserId() + "/" + event.getCampaignId() + "/" + event.getFilename();
+        return event.getUserId() + "/" + event.getCampaignId();
+    }
+
+    public void deleteAllRecords(String userId, String campaignId) {
+        fileRecordRepository.deleteByUserIdAndCampaignId(userId,campaignId);
     }
 }
